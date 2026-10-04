@@ -1,0 +1,100 @@
+Recreating dedicated experiment database: schema_labs_e3
+Timing is on.
+CREATE TABLE
+Time: 1.914 ms
+INSERT 0 2000000
+Time: 4315.362 ms (00:04.315)
+ANALYZE
+Time: 60.077 ms
+ initial_rows 
+--------------
+      2000000
+(1 row)
+
+Time: 26.693 ms
+CREATE TABLE
+Time: 1.464 ms
+INSERT 0 4
+Time: 0.282 ms
+ALTER TABLE
+Time: 0.103 ms
+CREATE FUNCTION
+Time: 1.199 ms
+CREATE TRIGGER
+Time: 0.328 ms
+--- Batched backfill with concurrent writer ---
+Backfill duration: 5.136 seconds
+ inconsistent_rows 
+-------------------
+                 0
+(1 row)
+
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ANALYZE
+--- Transactional cutover (writer is still active) ---
+BEGIN
+SET
+ALTER TABLE
+DROP TRIGGER
+ALTER TABLE
+CREATE VIEW
+CREATE FUNCTION
+CREATE TRIGGER
+COMMIT
+Cutover transaction duration (client observed): 0.036 seconds
+   id    | status  
+---------+---------
+ 2000139 | pending
+(1 row)
+
+INSERT 0 1
+UPDATE 1
+ id | status 
+----+--------
+  1 | paid
+(1 row)
+
+                                                                             QUERY PLAN                                                                             
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=35111.60..35111.61 rows=1 width=8) (actual time=82.289..83.524 rows=1 loops=1)
+   Buffers: shared hit=12326 read=11319 written=45
+   ->  Gather  (cost=35111.38..35111.59 rows=2 width=8) (actual time=82.230..83.521 rows=3 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=12326 read=11319 written=45
+         ->  Partial Aggregate  (cost=34111.38..34111.39 rows=1 width=8) (actual time=79.418..79.419 rows=1 loops=3)
+               Buffers: shared hit=12326 read=11319 written=45
+               ->  Hash Join  (cost=8.18..34109.79 rows=636 width=0) (actual time=0.852..74.715 rows=166701 loops=3)
+                     Hash Cond: (b.status_id = s.id)
+                     Buffers: shared hit=12326 read=11319 written=45
+                     ->  Parallel Seq Scan on orders_base b  (cost=0.00..31906.89 rows=833389 width=2) (actual time=0.813..44.420 rows=666713 loops=3)
+                           Buffers: shared hit=12254 read=11319 written=45
+                     ->  Hash  (cost=8.17..8.17 rows=1 width=2) (actual time=0.010..0.010 rows=1 loops=3)
+                           Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                           Buffers: shared hit=8
+                           ->  Index Scan using order_status_name_key on order_status s  (cost=0.15..8.17 rows=1 width=2) (actual time=0.004..0.005 rows=1 loops=3)
+                                 Index Cond: (name = 'paid'::text)
+                                 Buffers: shared hit=8
+ Planning:
+   Buffers: shared hit=6
+ Planning Time: 0.043 ms
+ Execution Time: 83.541 ms
+(23 rows)
+
+ paid_rows 
+-----------
+    500105
+(1 row)
+
+ total_rows 
+------------
+    2000142
+(1 row)
+
+--- Writer results ---
+Writer completed 144 iterations
+Writer log: /var/folders/z4/wjmth2gx0bn69c856c8br2hr0000gn/T//schema-labs-e3.HpE5UC/writer.log
+Writer log: /var/folders/z4/wjmth2gx0bn69c856c8br2hr0000gn/T//schema-labs-e3.HpE5UC/writer.log
