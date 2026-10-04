@@ -13,7 +13,7 @@ I’m using a MacBook Pro with PostgreSQL 16.
 
 The local database uses port `5499`, socket `/tmp`, user `pg`, and database `postgres`.
 
-## Set up on your Mac
+## Set Pre-reqs on your Mac
 
 Install [Homebrew](https://brew.sh) if needed, then install PostgreSQL:
 
@@ -21,26 +21,3 @@ Install [Homebrew](https://brew.sh) if needed, then install PostgreSQL:
 brew install postgresql@16
 export PATH="$(brew --prefix postgresql@16)/bin:$PATH"
 ```
-
-From the `experiments` directory, run the macOS version of `start-postgres.sh`:
-
-```bash
-chmod +x start-postgres.sh
-./start-postgres.sh
-```
-
-Run it as your normal Mac user, without `sudo`. It creates the sandbox on the first run and reuses it afterward.
-
-To connect:
-
-```bash
-psql -h /tmp -p 5499 -U pg -d postgres
-```
-
-To stop:
-
-```bash
-pg_ctl -D /tmp/schema-labs-pgdata -m fast -w stop
-```
-
-This is a local sandbox with passwordless authentication. Its data lives in `/tmp/schema-labs-pgdata`, which macOS may clear.
