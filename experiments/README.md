@@ -61,7 +61,20 @@ chmod +x e3-online-expand-contract.sh
 
 It loads 2 million TEXT orders, adds a SMALLINT `status_id` that a trigger keeps in sync, and backfills it in batches of 100,000 while a second client keeps inserting and updating. Then it validates the constraints and swaps in an `orders` view in one short transaction. The script stops if any row maps to the wrong status.
 
-Experiments #5, #6, and #8 reuse this database. Running this script again resets it.
+
+## Experiment #4: Is the ENUM Really Transparent?
+
+From `e4-enum-semantics/`:
+
+```bash
+createdb -h /tmp -p 5499 -U pg schema_labs_e4
+psql -h /tmp -p 5499 -U pg -d schema_labs_e4 \
+    -X -q -f e4-enum-semantics.sql 2>&1 | tee e4-enum-semantics.log
+```
+
+This runs the same queries against a TEXT column and an ENUM column: equality with a literal, `LIKE`, a text expression, `ORDER BY`, a range comparison, and a prepared statement with a text-typed parameter and an untyped one. Errors are part of the result, so the script keeps going after them.
+
+To run it again, drop and recreate `schema_labs_e4` first.
 
 ## Other Commands
 

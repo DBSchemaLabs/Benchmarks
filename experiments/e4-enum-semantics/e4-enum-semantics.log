@@ -1,0 +1,69 @@
+--- T1: equality with a string literal
+ text_rows 
+-----------
+         1
+(1 row)
+
+ enum_rows 
+-----------
+         1
+(1 row)
+
+--- T2: LIKE
+ text_rows 
+-----------
+         2
+(1 row)
+
+psql:e4-enum-semantics.sql:20: ERROR:  operator does not exist: order_status ~~ unknown
+LINE 1: ...unt(*) AS enum_rows FROM orders_enum WHERE status LIKE 'p%';
+                                                             ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+--- T3: comparing with a text expression
+ text_rows 
+-----------
+         1
+(1 row)
+
+psql:e4-enum-semantics.sql:24: ERROR:  operator does not exist: order_status = text
+LINE 1: ...unt(*) AS enum_rows FROM orders_enum WHERE status = lower('P...
+                                                             ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+--- T4: ORDER BY
+            text_order             
+-----------------------------------
+ cancelled, paid, pending, shipped
+(1 row)
+
+            enum_order             
+-----------------------------------
+ pending, paid, shipped, cancelled
+(1 row)
+
+--- T5: range comparison
+ text_after_paid  
+------------------
+ pending, shipped
+(1 row)
+
+  enum_after_paid   
+--------------------
+ cancelled, shipped
+(1 row)
+
+--- T6: a parameter bound as text, the way many drivers send strings
+ count 
+-------
+     1
+(1 row)
+
+psql:e4-enum-semantics.sql:39: ERROR:  operator does not exist: order_status = text
+LINE 1: ...text) AS SELECT count(*) FROM orders_enum WHERE status = $1;
+                                                                  ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+--- T7: the same parameter left untyped, so Postgres infers it
+ count 
+-------
+     1
+(1 row)
+
