@@ -48,6 +48,21 @@ chmod +x e2-lock-read.sh
 
 It checks the lock held by ALTER and compares a small indexed read during the rewrite with the same read afterward.
 
+## Experiment #3: Expand/Contract Inside the Database
+
+This script creates its own database, `schema_labs_e3`, so it doesn't depend on Experiments #1 or #2. It needs `python3` for timing.
+
+From `e3-traditional-expand-contract/`:
+
+```bash
+chmod +x e3-online-expand-contract.sh
+./e3-online-expand-contract.sh 2>&1 | tee e3-run-2.log
+```
+
+It loads 2 million TEXT orders, adds a SMALLINT `status_id` that a trigger keeps in sync, and backfills it in batches of 100,000 while a second client keeps inserting and updating. Then it validates the constraints and swaps in an `orders` view in one short transaction. The script stops if any row maps to the wrong status.
+
+Experiments #5, #6, and #8 reuse this database. Running this script again resets it.
+
 ## Other Commands
 
 ### Connect Manually
