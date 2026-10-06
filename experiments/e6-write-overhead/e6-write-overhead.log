@@ -1,0 +1,16 @@
+psql:e6-write-overhead.sql:5: NOTICE:  table "plain_orders" does not exist, skipping
+Time: 0.299 ms
+Time: 2.948 ms
+--- 20,000 inserts into a plain TEXT table
+Time: 0.061 ms
+Time: 34.892 ms
+Time: 0.058 ms
+--- 20,000 inserts into orders_base directly (SMALLINT, no translation)
+Time: 0.014 ms
+Time: 134.606 ms
+Time: 0.046 ms
+--- 20,000 inserts through the orders view (lookup + INSTEAD OF trigger)
+Time: 0.026 ms
+Time: 176.268 ms
+Time: 0.055 ms
+Time: 4.583 ms

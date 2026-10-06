@@ -89,6 +89,19 @@ psql -h /tmp -p 5499 -U pg -d schema_labs_e3 \
 
 It adds a rare `refunded` status (50 rows), indexes `orders_base(status_id)`, and compares the plan and time for finding those rows through the `orders` view and directly on `orders_base`. The rows and index are only added once, so it's safe to rerun.
 
+## Experiment #6: What Does the Write Trigger Cost?
+
+Run Experiment #3 first. This reuses `schema_labs_e3`.
+
+From `e6-write-overhead/`:
+
+```bash
+psql -h /tmp -p 5499 -U pg -d schema_labs_e3 \
+    -X -q -f e6-write-overhead.sql 2>&1 | tee e6-write-overhead.log
+```
+
+It times 20,000 single-row inserts three ways: into a plain TEXT table, into `orders_base` directly with a SMALLINT, and through the `orders` view. The middle case separates the trigger's cost from the cost of `orders_base`'s own constraints and indexes. Every insert is rolled back.
+
 ## Other Commands
 
 ### Connect Manually
