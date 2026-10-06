@@ -1,0 +1,46 @@
+Time: 0.910 ms
+Time: 92.349 ms
+Time: 489.135 ms
+Time: 56.243 ms
+ refunded_rows 
+---------------
+            50
+(1 row)
+
+Time: 0.246 ms
+--- Through the orders view
+                                                                       QUERY PLAN                                                                        
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1008.18..34696.89 rows=1527 width=40) (actual time=69.060..70.411 rows=50 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=12992 read=10117
+   ->  Hash Join  (cost=8.18..33544.19 rows=636 width=40) (actual time=66.465..66.468 rows=17 loops=3)
+         Hash Cond: (b.status_id = s.id)
+         Buffers: shared hit=12992 read=10117
+         ->  Parallel Seq Scan on orders_base b  (cost=0.00..31341.20 rows=833420 width=10) (actual time=0.024..44.818 rows=666736 loops=3)
+               Buffers: shared hit=12890 read=10117
+         ->  Hash  (cost=8.17..8.17 rows=1 width=34) (actual time=0.009..0.009 rows=1 loops=3)
+               Buckets: 1024  Batches: 1  Memory Usage: 9kB
+               Buffers: shared hit=8
+               ->  Index Scan using order_status_name_key on order_status s  (cost=0.15..8.17 rows=1 width=34) (actual time=0.005..0.005 rows=1 loops=3)
+                     Index Cond: (name = 'refunded'::text)
+                     Buffers: shared hit=8
+ Planning:
+   Buffers: shared hit=50
+ Planning Time: 0.105 ms
+ Execution Time: 70.423 ms
+(19 rows)
+
+Time: 70.701 ms
+--- Directly on orders_base
+                                                               QUERY PLAN                                                                
+-----------------------------------------------------------------------------------------------------------------------------------------
+ Index Scan using orders_base_status_id_idx on orders_base  (cost=0.43..8.45 rows=1 width=10) (actual time=0.005..0.009 rows=50 loops=1)
+   Index Cond: (status_id = 5)
+   Buffers: shared hit=5
+ Planning Time: 0.038 ms
+ Execution Time: 0.015 ms
+(5 rows)
+
+Time: 0.124 ms

@@ -76,6 +76,19 @@ This runs the same queries against a TEXT column and an ENUM column: equality wi
 
 To run it again, drop and recreate `schema_labs_e4` first.
 
+## Experiment #5: Does the View Still Use an Index?
+
+Run Experiment #3 first. This reuses `schema_labs_e3`.
+
+From `e5-view-index/`:
+
+```bash
+psql -h /tmp -p 5499 -U pg -d schema_labs_e3 \
+    -X -q -f e5-view-index.sql 2>&1 | tee e5-view-index.log
+```
+
+It adds a rare `refunded` status (50 rows), indexes `orders_base(status_id)`, and compares the plan and time for finding those rows through the `orders` view and directly on `orders_base`. The rows and index are only added once, so it's safe to rerun.
+
 ## Other Commands
 
 ### Connect Manually
