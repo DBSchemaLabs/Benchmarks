@@ -102,6 +102,20 @@ psql -h /tmp -p 5499 -U pg -d schema_labs_e3 \
 
 It times 20,000 single-row inserts three ways: into a plain TEXT table, into `orders_base` directly with a SMALLINT, and through the `orders` view. The middle case separates the trigger's cost from the cost of `orders_base`'s own constraints and indexes. Every insert is rolled back.
 
+## Experiment #7: Prepared Statements Across Schema Changes
+
+From `e7-prepared-statements/`:
+
+```bash
+createdb -h /tmp -p 5499 -U pg schema_labs_e7
+psql -h /tmp -p 5499 -U pg -d schema_labs_e7 \
+    -X -q -f e7-prepared-statements.sql 2>&1 | tee e7-prepared-statements.log
+```
+
+It prepares a query, changes the schema underneath it, and runs the query again: first a table-to-view swap like Experiment #3, then an in-place type change like Experiment #1. The view returns a different value from the table, so the output shows which one was read.
+
+To run it again, drop and recreate `schema_labs_e7` first.
+
 ## Other Commands
 
 ### Connect Manually

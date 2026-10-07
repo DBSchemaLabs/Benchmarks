@@ -1,0 +1,24 @@
+--- T1: rename the table and put a view in its place (E3)
+     status     
+----------------
+ from-old-table
+(1 row)
+
+    status     
+---------------
+ from-new-view
+(1 row)
+
+--- T2: change the column type in place (E1)
+ status 
+--------
+ paid
+(1 row)
+
+psql:e7-prepared-statements.sql:34: ERROR:  cached plan must not change result type
+--- T2: prepare the same query again
+ status 
+--------
+ paid
+(1 row)
+
