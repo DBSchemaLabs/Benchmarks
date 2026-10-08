@@ -116,6 +116,19 @@ It prepares a query, changes the schema underneath it, and runs the query again:
 
 To run it again, drop and recreate `schema_labs_e7` first.
 
+## Experiment #8: What Can't You Do Through the View?
+
+Run Experiment #3 first. This reuses `schema_labs_e3`.
+
+From `e8-view-limits/`:
+
+```bash
+psql -h /tmp -p 5499 -U pg -d schema_labs_e3 \
+    -X -q -f e8-view-limits.sql 2>&1 | tee e8-view-limits.log
+```
+
+It tries an upsert, `SELECT ... FOR UPDATE`, `COPY`, `TRUNCATE`, and `ALTER TABLE` against the `orders` view. Each one runs in a transaction that is rolled back.
+
 ## Other Commands
 
 ### Connect Manually

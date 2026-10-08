@@ -1,0 +1,19 @@
+--- T1: upsert
+psql:e8-view-limits.sql:7: ERROR:  there is no unique or exclusion constraint matching the ON CONFLICT specification
+--- T2: row lock
+ id | status 
+----+--------
+  1 | paid
+(1 row)
+
+--- T3: COPY into the view
+ copied_rows 
+-------------
+           2
+(1 row)
+
+--- T4: TRUNCATE
+psql:e8-view-limits.sql:26: ERROR:  "orders" is not a table
+--- T5: ALTER TABLE, as a later migration or ORM would
+psql:e8-view-limits.sql:31: ERROR:  ALTER action ADD COLUMN cannot be performed on relation "orders"
+DETAIL:  This operation is not supported for views.
