@@ -129,6 +129,19 @@ psql -h /tmp -p 5499 -U pg -d schema_labs_e3 \
 
 It tries an upsert, `SELECT ... FOR UPDATE`, `COPY`, `TRUNCATE`, and `ALTER TABLE` against the `orders` view. Each one runs in a transaction that is rolled back.
 
+## Experiment #9: Readers Queued Behind a Waiting ALTER
+
+This script recreates its own database, `schema_labs_e9`.
+
+From `e9-lock-queue/`:
+
+```bash
+chmod +x e9-lock-queue.sh
+./e9-lock-queue.sh 2>&1 | tee e9-lock-queue.log
+```
+
+It holds a 4-second read on `orders`, starts an `ALTER TABLE` behind it, then times a small primary-key read and prints `pg_locks` while the ALTER waits. Then it repeats the test with `lock_timeout = '200ms'` on the ALTER.
+
 ## Other Commands
 
 ### Connect Manually

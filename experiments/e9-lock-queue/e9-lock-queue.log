@@ -1,0 +1,25 @@
+Recreating dedicated experiment database: schema_labs_e9
+NOTICE:  database "schema_labs_e9" does not exist, skipping
+--- T1: ALTER without lock_timeout
+Locks while the ALTER waits:
+  pid  |        mode         | granted |                     query                     
+-------+---------------------+---------+-----------------------------------------------
+ 90455 | AccessShareLock     | t       | BEGIN; SELECT count(*) FROM orders; SELECT pg
+ 90458 | AccessExclusiveLock | f       | ALTER TABLE orders ADD COLUMN note text;
+ 90461 | AccessShareLock     | f       | SELECT status FROM orders WHERE id = 5;
+(3 rows)
+
+ status 
+--------
+ paid
+(1 row)
+
+Time: 2978.875 ms (00:02.979)
+--- T2: ALTER with lock_timeout = 200ms
+ERROR:  canceling statement due to lock timeout
+ status 
+--------
+ paid
+(1 row)
+
+Time: 0.740 ms
