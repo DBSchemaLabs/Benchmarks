@@ -9,7 +9,7 @@ brew install postgresql@16
 export PATH="$(brew --prefix postgresql@16)/bin:$PATH"
 ```
 
-From the `experiments` directory, start the sandbox:
+From the `experiment-phase-1` directory, start the sandbox:
 
 ```bash
 chmod +x start-postgres.sh
